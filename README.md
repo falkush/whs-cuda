@@ -1,5 +1,5 @@
 # whs-cuda
-Real-time Rendering of a Wormhole using Cuda and SFML
+Real-time rendering of a wormhole using Cuda and SFML
 
 # Warning
 To control the camera, the game recenters your mouse cursor in the middle of the window on every frame. You recover the control of the mouse by pressing ESC. This worked on my computer, but might not work on yours. Please save your files before running this game as you may be forced to restart your computer.
