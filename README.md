@@ -26,6 +26,6 @@ v: decrease wormhole distance
 
 p: reset
 
-# Requirement
+# Requirements
 - Nvidia GPU
 - 64-bits architecture
