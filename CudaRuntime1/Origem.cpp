@@ -3,9 +3,6 @@
 #include <SFML/Graphics.hpp>
 #include "windows.h" 
 
-
-
-
 void cudathingy(uint8_t* pixels, bool flipg, double dc, double uhpy, double pos0, double pos1, double pos2, double vec0, double vec1, double vec2, double addy0, double addy1, double addy2, double addz0, double addz1, double addz2, double bhsize, double whsize);
 void cudaInit();
 void cudaExit();
@@ -21,6 +18,8 @@ int main()
 	double dist = 1;
 	double sqsz = 0.01 / 4;
 	double speed = 0.01;
+	double anglex, angley;
+	double xl;
 
 	double vecperp0, vecperp1, vecperp2;
 	double vecperpn;
@@ -53,14 +52,13 @@ int main()
 	double lerayon, lex1, lex2, ley2;
 
 	double exitlgt, exitangle, newang;
-	double newv0, newv1, newv2;
 
-	double dotp1, dotp2;
-	double proj0, proj1, proj2;
-	double projn;
-	double tmpl, ang1;
 	double vectmpx0, vectmpx1, vectmpx2;
 	double angx1, dist2, distrem;
+
+	double leangle2;
+	double dotpx1s, dotpx1vp, vecproj0, vecproj1, vecproj2, angf1, vecprojn, leangletmp;
+	double levectmp0, levectmp1, levectmp2;
 
     bool focus = true;
 
@@ -75,6 +73,7 @@ int main()
     window.setMouseCursorVisible(false);
 
     pos0 = -5;
+	pos1 = 0.001;
 
     winpos = window.getPosition();
     SetCursorPos(winpos.x + 1280 / 2, winpos.y + 720 / 2);
@@ -101,75 +100,79 @@ int main()
 				mousx = p.x - centralx;
 				mousy = p.y - centraly;
 
+				anglex = 0.002 * mousx;
+				angley = 0.002 * mousy;
 
-				angle = 0.001 * sqrt(mousx * mousx + mousy * mousy);
+				if (anglex < 0) anglex *= -1;
+				if (angley < 0) angley *= -1;
+
 
 				if (mousx > 0)
 				{
-					newx00 = x00 * cos(angle) + sin(angle) * x10;
-					newx10 = x10 * cos(angle) - sin(angle) * x00;
+					newx00 = x00 * cos(anglex) + sin(anglex) * x10;
+					newx10 = x10 * cos(anglex) - sin(anglex) * x00;
 					x00 = newx00;
 					x10 = newx10;
 
-					newx01 = x01 * cos(angle) + sin(angle) * x11;
-					newx11 = x11 * cos(angle) - sin(angle) * x01;
+					newx01 = x01 * cos(anglex) + sin(anglex) * x11;
+					newx11 = x11 * cos(anglex) - sin(anglex) * x01;
 					x01 = newx01;
 					x11 = newx11;
 
-					newx02 = x02 * cos(angle) + sin(angle) * x12;
-					newx12 = x12 * cos(angle) - sin(angle) * x02;
+					newx02 = x02 * cos(anglex) + sin(anglex) * x12;
+					newx12 = x12 * cos(anglex) - sin(anglex) * x02;
 					x02 = newx02;
 					x12 = newx12;
 				}
 				else if (mousx < 0)
 				{
-					newx00 = x00 * cos(angle) - sin(angle) * x10;
-					newx10 = x10 * cos(angle) + sin(angle) * x00;
+					newx00 = x00 * cos(anglex) - sin(anglex) * x10;
+					newx10 = x10 * cos(anglex) + sin(anglex) * x00;
 					x00 = newx00;
 					x10 = newx10;
 
-					newx01 = x01 * cos(angle) - sin(angle) * x11;
-					newx11 = x11 * cos(angle) + sin(angle) * x01;
+					newx01 = x01 * cos(anglex) - sin(anglex) * x11;
+					newx11 = x11 * cos(anglex) + sin(anglex) * x01;
 					x01 = newx01;
 					x11 = newx11;
 
-					newx02 = x02 * cos(angle) - sin(angle) * x12;
-					newx12 = x12 * cos(angle) + sin(angle) * x02;
+					newx02 = x02 * cos(anglex) - sin(anglex) * x12;
+					newx12 = x12 * cos(anglex) + sin(anglex) * x02;
 					x02 = newx02;
 					x12 = newx12;
 				}
 
 				if (mousy < 0)
 				{
-					newx00 = x00 * cos(angle) + sin(angle) * x20;
-					newx20 = x20 * cos(angle) - sin(angle) * x00;
+					newx00 = x00 * cos(angley) + sin(angley) * x20;
+					newx20 = x20 * cos(angley) - sin(angley) * x00;
 					x00 = newx00;
 					x20 = newx20;
 
-					newx01 = x01 * cos(angle) + sin(angle) * x21;
-					newx21 = x21 * cos(angle) - sin(angle) * x01;
+					newx01 = x01 * cos(angley) + sin(angley) * x21;
+					newx21 = x21 * cos(angley) - sin(angley) * x01;
 					x01 = newx01;
 					x21 = newx21;
 
-					newx02 = x02 * cos(angle) + sin(angle) * x22;
-					newx22 = x22 * cos(angle) - sin(angle) * x02;
+					newx02 = x02 * cos(angley) + sin(angley) * x22;
+					newx22 = x22 * cos(angley) - sin(angley) * x02;
 					x02 = newx02;
 					x22 = newx22;
 				}
 				else if (mousy > 0)
 				{
-					newx00 = x00 * cos(angle) - sin(angle) * x20;
-					newx20 = x20 * cos(angle) + sin(angle) * x00;
+					newx00 = x00 * cos(angley) - sin(angley) * x20;
+					newx20 = x20 * cos(angley) + sin(angley) * x00;
 					x00 = newx00;
 					x20 = newx20;
 
-					newx01 = x01 * cos(angle) - sin(angle) * x21;
-					newx21 = x21 * cos(angle) + sin(angle) * x01;
+					newx01 = x01 * cos(angley) - sin(angley) * x21;
+					newx21 = x21 * cos(angley) + sin(angley) * x01;
 					x01 = newx01;
 					x21 = newx21;
 
-					newx02 = x02 * cos(angle) - sin(angle) * x22;
-					newx22 = x22 * cos(angle) + sin(angle) * x02;
+					newx02 = x02 * cos(angley) - sin(angley) * x22;
+					newx22 = x22 * cos(angley) + sin(angley) * x02;
 					x02 = newx02;
 					x22 = newx22;
 				}
@@ -183,10 +186,11 @@ int main()
 			x00 = 1; x01 = 0; x02 = 0;
 			x10 = 0; x11 = 1; x12 = 0;
 			x20 = 0; x21 = 0; x22 = 1;
-			pos0 = -5; pos1 = 0; pos2 = 0;
+			pos0 = -5; pos1 = 0.001; pos2 = 0;
 			bhsize = 2 * M_PI;
 			whsize = M_PI;
 		}
+
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
             {
@@ -272,85 +276,87 @@ int main()
 							pos1 *= 1 / ley2;
 							pos2 *= 1 / ley2;
 
-							newv0 = cos(M_PI + exitangle - newang) * sxn + sin(M_PI + exitangle - newang) * vecperp0;
-							newv1 = cos(M_PI + exitangle - newang) * syn + sin(M_PI + exitangle - newang) * vecperp1;
-							newv2 = cos(M_PI + exitangle - newang) * szn + sin(M_PI + exitangle - newang) * vecperp2;
+							leangle2 = M_PI + exitangle - newang;
+							x00 = cos(leangle2) * sxn + sin(leangle2) * vecperp0;
+							x01 = cos(leangle2) * syn + sin(leangle2) * vecperp1;
+							x02 = cos(leangle2) * szn + sin(leangle2) * vecperp2;
+							
+							
+							dotpx1s = x10 * sxn + x11 * syn + x12 * szn;
+							dotpx1vp = x10 * vecperp0 + x11 * vecperp1 + x12 * vecperp2;
+
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
+
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+
+							 
+								
+							angf1 = acos(vecproj0*sxn+vecproj1*syn+vecproj2*szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
+
+							
+							leangletmp = angf1 + leangle2 - leangle;
+
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
+
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
+
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
+
+							x10 = x10 - vecproj0 + levectmp0;
+							x11 = x11 - vecproj1 + levectmp1;
+							x12 = x12 - vecproj2 + levectmp2;
 
 
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x10 + newv1 * x11 + newv2 * x12;
+							dotpx1s = x20 * sxn + x21 * syn + x22 * szn;
+							dotpx1vp = x20 * vecperp0 + x21 * vecperp1 + x22 * vecperp2;
 
-							proj0 = x00 * dotp1 + x10 * dotp2;
-							proj1 = x01 * dotp1 + x11 * dotp2;
-							proj2 = x02 * dotp1 + x12 * dotp2;
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x10 + proj1 * x11 + proj2 * x12 < 0) ang1 *= -1;
-							}
+							
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x10;
-							newx10 = x10 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x10 = newx10;
+							leangletmp = angf1 + leangle2 - leangle;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x11;
-							newx11 = x11 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x11 = newx11;
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x12;
-							newx12 = x12 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x12 = newx12;
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
 
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x20 + newv1 * x21 + newv2 * x22;
-
-							proj0 = x00 * dotp1 + x20 * dotp2;
-							proj1 = x01 * dotp1 + x21 * dotp2;
-							proj2 = x02 * dotp1 + x22 * dotp2;
-
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
-
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
-
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x20 + proj1 * x21 + proj2 * x22 < 0) ang1 *= -1;
-							}
-
-							newx00 = x00 * cos(ang1) + sin(ang1) * x20;
-							newx20 = x20 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x20 = newx20;
-
-							newx01 = x01 * cos(ang1) + sin(ang1) * x21;
-							newx21 = x21 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x21 = newx21;
-
-							newx02 = x02 * cos(ang1) + sin(ang1) * x22;
-							newx22 = x22 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x22 = newx22;
-
+							x20 = x20 - vecproj0 + levectmp0;
+							x21 = x21 - vecproj1 + levectmp1;
+							x22 = x22 - vecproj2 + levectmp2;
 
 						}
 						else
@@ -378,82 +384,84 @@ int main()
 							pos1 *= 1 / whsize;
 							pos2 *= 1 / whsize;
 
-							newv0 = cos(M_PI + exitangle - newang) * sxn + sin(M_PI + exitangle - newang) * vecperp0;
-							newv1 = cos(M_PI + exitangle - newang) * syn + sin(M_PI + exitangle - newang) * vecperp1;
-							newv2 = cos(M_PI + exitangle - newang) * szn + sin(M_PI + exitangle - newang) * vecperp2;
+							leangle2 = M_PI + exitangle - newang;
+							x00 = cos(leangle2) * sxn + sin(leangle2) * vecperp0;
+							x01 = cos(leangle2) * syn + sin(leangle2) * vecperp1;
+							x02 = cos(leangle2) * szn + sin(leangle2) * vecperp2;
 
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x10 + newv1 * x11 + newv2 * x12;
+							dotpx1s = x10 * sxn + x11 * syn + x12 * szn;
+							dotpx1vp = x10 * vecperp0 + x11 * vecperp1 + x12 * vecperp2;
 
-							proj0 = x00 * dotp1 + x10 * dotp2;
-							proj1 = x01 * dotp1 + x11 * dotp2;
-							proj2 = x02 * dotp1 + x12 * dotp2;
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x10 + proj1 * x11 + proj2 * x12 < 0) ang1 *= -1;
-							}
+							leangletmp = angf1 + leangle2 - leangle;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x10;
-							newx10 = x10 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x10 = newx10;
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x11;
-							newx11 = x11 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x11 = newx11;
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x12;
-							newx12 = x12 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x12 = newx12;
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x20 + newv1 * x21 + newv2 * x22;
+							x10 = x10 - vecproj0 + levectmp0;
+							x11 = x11 - vecproj1 + levectmp1;
+							x12 = x12 - vecproj2 + levectmp2;
 
-							proj0 = x00 * dotp1 + x20 * dotp2;
-							proj1 = x01 * dotp1 + x21 * dotp2;
-							proj2 = x02 * dotp1 + x22 * dotp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
+							dotpx1s = x20 * sxn + x21 * syn + x22 * szn;
+							dotpx1vp = x20 * vecperp0 + x21 * vecperp1 + x22 * vecperp2;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x20 + proj1 * x21 + proj2 * x22 < 0) ang1 *= -1;
-							}
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x20;
-							newx20 = x20 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x20 = newx20;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x21;
-							newx21 = x21 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x21 = newx21;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x22;
-							newx22 = x22 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x22 = newx22;
+
+							leangletmp = angf1 + leangle2 - leangle;
+
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
+
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
+
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
+
+							x20 = x20 - vecproj0 + levectmp0;
+							x21 = x21 - vecproj1 + levectmp1;
+							x22 = x22 - vecproj2 + levectmp2;
 
 
 
@@ -546,81 +554,84 @@ int main()
 							pos1 *= 1 / ley2;
 							pos2 *= 1 / ley2;
 
-							newv0 = cos(M_PI + exitangle - newang) * sxn + sin(M_PI + exitangle - newang) * vecperp0;
-							newv1 = cos(M_PI + exitangle - newang) * syn + sin(M_PI + exitangle - newang) * vecperp1;
-							newv2 = cos(M_PI + exitangle - newang) * szn + sin(M_PI + exitangle - newang) * vecperp2;
+							leangle2 = M_PI + exitangle - newang;
+							x00 = cos(leangle2) * sxn + sin(leangle2) * vecperp0;
+							x01 = cos(leangle2) * syn + sin(leangle2) * vecperp1;
+							x02 = cos(leangle2) * szn + sin(leangle2) * vecperp2;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x10 + newv1 * x11 + newv2 * x12;
 
-							proj0 = x00 * dotp1 + x10 * dotp2;
-							proj1 = x01 * dotp1 + x11 * dotp2;
-							proj2 = x02 * dotp1 + x12 * dotp2;
+							dotpx1s = x10 * sxn + x11 * syn + x12 * szn;
+							dotpx1vp = x10 * vecperp0 + x11 * vecperp1 + x12 * vecperp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x10 + proj1 * x11 + proj2 * x12 < 0) ang1 *= -1;
-							}
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x10;
-							newx10 = x10 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x10 = newx10;
+							leangletmp = angf1 + leangle2 - leangle;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x11;
-							newx11 = x11 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x11 = newx11;
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x12;
-							newx12 = x12 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x12 = newx12;
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x20 + newv1 * x21 + newv2 * x22;
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
 
-							proj0 = x00 * dotp1 + x20 * dotp2;
-							proj1 = x01 * dotp1 + x21 * dotp2;
-							proj2 = x02 * dotp1 + x22 * dotp2;
+							x10 = x10 - vecproj0 + levectmp0;
+							x11 = x11 - vecproj1 + levectmp1;
+							x12 = x12 - vecproj2 + levectmp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x20 + proj1 * x21 + proj2 * x22 < 0) ang1 *= -1;
-							}
+							dotpx1s = x20 * sxn + x21 * syn + x22 * szn;
+							dotpx1vp = x20 * vecperp0 + x21 * vecperp1 + x22 * vecperp2;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x20;
-							newx20 = x20 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x20 = newx20;
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x21;
-							newx21 = x21 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x21 = newx21;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x22;
-							newx22 = x22 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x22 = newx22;
+
+
+							leangletmp = angf1 + leangle2 - leangle;
+
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
+
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
+
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
+
+							x20 = x20 - vecproj0 + levectmp0;
+							x21 = x21 - vecproj1 + levectmp1;
+							x22 = x22 - vecproj2 + levectmp2;
 						}
 
 					}
@@ -704,86 +715,85 @@ int main()
 							pos1 *= 1 / ley2;
 							pos2 *= 1 / ley2;
 
-							newv0 = cos(M_PI + exitangle - newang) * sxn + sin(M_PI + exitangle - newang) * vecperp0;
-							newv1 = cos(M_PI + exitangle - newang) * syn + sin(M_PI + exitangle - newang) * vecperp1;
-							newv2 = cos(M_PI + exitangle - newang) * szn + sin(M_PI + exitangle - newang) * vecperp2;
+							leangle2 = M_PI + exitangle - newang;
+							x00 = cos(leangle2) * sxn + sin(leangle2) * vecperp0;
+							x01 = cos(leangle2) * syn + sin(leangle2) * vecperp1;
+							x02 = cos(leangle2) * szn + sin(leangle2) * vecperp2;
+
+
+							dotpx1s = x10 * sxn + x11 * syn + x12 * szn;
+							dotpx1vp = x10 * vecperp0 + x11 * vecperp1 + x12 * vecperp2;
+
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
+
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
+
+
+							leangletmp = angf1 + leangle2 - leangle;
+
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
+
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
+
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
+
+							x10 = x10 - vecproj0 + levectmp0;
+							x11 = x11 - vecproj1 + levectmp1;
+							x12 = x12 - vecproj2 + levectmp2;
 
 
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x10 + newv1 * x11 + newv2 * x12;
+							dotpx1s = x20 * sxn + x21 * syn + x22 * szn;
+							dotpx1vp = x20 * vecperp0 + x21 * vecperp1 + x22 * vecperp2;
 
-							proj0 = x00 * dotp1 + x10 * dotp2;
-							proj1 = x01 * dotp1 + x11 * dotp2;
-							proj2 = x02 * dotp1 + x12 * dotp2;
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
-
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
-
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x10 + proj1 * x11 + proj2 * x12 < 0) ang1 *= -1;
-							}
-
-							newx00 = x00 * cos(ang1) + sin(ang1) * x10;
-							newx10 = x10 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x10 = newx10;
-
-							newx01 = x01 * cos(ang1) + sin(ang1) * x11;
-							newx11 = x11 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x11 = newx11;
-
-							newx02 = x02 * cos(ang1) + sin(ang1) * x12;
-							newx12 = x12 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x12 = newx12;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x20 + newv1 * x21 + newv2 * x22;
 
-							proj0 = x00 * dotp1 + x20 * dotp2;
-							proj1 = x01 * dotp1 + x21 * dotp2;
-							proj2 = x02 * dotp1 + x22 * dotp2;
+							leangletmp = angf1 + leangle2 - leangle;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x20 + proj1 * x21 + proj2 * x22 < 0) ang1 *= -1;
-							}
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x20;
-							newx20 = x20 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x20 = newx20;
-
-							newx01 = x01 * cos(ang1) + sin(ang1) * x21;
-							newx21 = x21 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x21 = newx21;
-
-							newx02 = x02 * cos(ang1) + sin(ang1) * x22;
-							newx22 = x22 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x22 = newx22;
-
-
+							x20 = x20 - vecproj0 + levectmp0;
+							x21 = x21 - vecproj1 + levectmp1;
+							x22 = x22 - vecproj2 + levectmp2;
 						}
 						else
 						{
@@ -810,82 +820,84 @@ int main()
 							pos1 *= 1 / whsize;
 							pos2 *= 1 / whsize;
 
-							newv0 = cos(M_PI + exitangle - newang) * sxn + sin(M_PI + exitangle - newang) * vecperp0;
-							newv1 = cos(M_PI + exitangle - newang) * syn + sin(M_PI + exitangle - newang) * vecperp1;
-							newv2 = cos(M_PI + exitangle - newang) * szn + sin(M_PI + exitangle - newang) * vecperp2;
+							leangle2 = M_PI + exitangle - newang;
+							x00 = cos(leangle2) * sxn + sin(leangle2) * vecperp0;
+							x01 = cos(leangle2) * syn + sin(leangle2) * vecperp1;
+							x02 = cos(leangle2) * szn + sin(leangle2) * vecperp2;
 
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x10 + newv1 * x11 + newv2 * x12;
+							dotpx1s = x10 * sxn + x11 * syn + x12 * szn;
+							dotpx1vp = x10 * vecperp0 + x11 * vecperp1 + x12 * vecperp2;
 
-							proj0 = x00 * dotp1 + x10 * dotp2;
-							proj1 = x01 * dotp1 + x11 * dotp2;
-							proj2 = x02 * dotp1 + x12 * dotp2;
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x10 + proj1 * x11 + proj2 * x12 < 0) ang1 *= -1;
-							}
+							leangletmp = angf1 + leangle2 - leangle;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x10;
-							newx10 = x10 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x10 = newx10;
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x11;
-							newx11 = x11 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x11 = newx11;
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x12;
-							newx12 = x12 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x12 = newx12;
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x20 + newv1 * x21 + newv2 * x22;
+							x10 = x10 - vecproj0 + levectmp0;
+							x11 = x11 - vecproj1 + levectmp1;
+							x12 = x12 - vecproj2 + levectmp2;
 
-							proj0 = x00 * dotp1 + x20 * dotp2;
-							proj1 = x01 * dotp1 + x21 * dotp2;
-							proj2 = x02 * dotp1 + x22 * dotp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
+							dotpx1s = x20 * sxn + x21 * syn + x22 * szn;
+							dotpx1vp = x20 * vecperp0 + x21 * vecperp1 + x22 * vecperp2;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x20 + proj1 * x21 + proj2 * x22 < 0) ang1 *= -1;
-							}
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x20;
-							newx20 = x20 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x20 = newx20;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x21;
-							newx21 = x21 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x21 = newx21;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x22;
-							newx22 = x22 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x22 = newx22;
+
+							leangletmp = angf1 + leangle2 - leangle;
+
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
+
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
+
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
+
+							x20 = x20 - vecproj0 + levectmp0;
+							x21 = x21 - vecproj1 + levectmp1;
+							x22 = x22 - vecproj2 + levectmp2;
 
 
 
@@ -978,81 +990,84 @@ int main()
 							pos1 *= 1 / ley2;
 							pos2 *= 1 / ley2;
 
-							newv0 = cos(M_PI + exitangle - newang) * sxn + sin(M_PI + exitangle - newang) * vecperp0;
-							newv1 = cos(M_PI + exitangle - newang) * syn + sin(M_PI + exitangle - newang) * vecperp1;
-							newv2 = cos(M_PI + exitangle - newang) * szn + sin(M_PI + exitangle - newang) * vecperp2;
+							leangle2 = M_PI + exitangle - newang;
+							x00 = cos(leangle2) * sxn + sin(leangle2) * vecperp0;
+							x01 = cos(leangle2) * syn + sin(leangle2) * vecperp1;
+							x02 = cos(leangle2) * szn + sin(leangle2) * vecperp2;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x10 + newv1 * x11 + newv2 * x12;
 
-							proj0 = x00 * dotp1 + x10 * dotp2;
-							proj1 = x01 * dotp1 + x11 * dotp2;
-							proj2 = x02 * dotp1 + x12 * dotp2;
+							dotpx1s = x10 * sxn + x11 * syn + x12 * szn;
+							dotpx1vp = x10 * vecperp0 + x11 * vecperp1 + x12 * vecperp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x10 + proj1 * x11 + proj2 * x12 < 0) ang1 *= -1;
-							}
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x10;
-							newx10 = x10 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x10 = newx10;
+							leangletmp = angf1 + leangle2 - leangle;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x11;
-							newx11 = x11 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x11 = newx11;
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x12;
-							newx12 = x12 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x12 = newx12;
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x20 + newv1 * x21 + newv2 * x22;
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
 
-							proj0 = x00 * dotp1 + x20 * dotp2;
-							proj1 = x01 * dotp1 + x21 * dotp2;
-							proj2 = x02 * dotp1 + x22 * dotp2;
+							x10 = x10 - vecproj0 + levectmp0;
+							x11 = x11 - vecproj1 + levectmp1;
+							x12 = x12 - vecproj2 + levectmp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x20 + proj1 * x21 + proj2 * x22 < 0) ang1 *= -1;
-							}
+							dotpx1s = x20 * sxn + x21 * syn + x22 * szn;
+							dotpx1vp = x20 * vecperp0 + x21 * vecperp1 + x22 * vecperp2;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x20;
-							newx20 = x20 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x20 = newx20;
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x21;
-							newx21 = x21 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x21 = newx21;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x22;
-							newx22 = x22 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x22 = newx22;
+
+
+							leangletmp = angf1 + leangle2 - leangle;
+
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
+
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
+
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
+
+							x20 = x20 - vecproj0 + levectmp0;
+							x21 = x21 - vecproj1 + levectmp1;
+							x22 = x22 - vecproj2 + levectmp2;
 						}
 
 					}
@@ -1154,86 +1169,84 @@ int main()
 							pos1 *= 1 / ley2;
 							pos2 *= 1 / ley2;
 
-							newv0 = cos(M_PI + exitangle - newang) * sxn + sin(M_PI + exitangle - newang) * vecperp0;
-							newv1 = cos(M_PI + exitangle - newang) * syn + sin(M_PI + exitangle - newang) * vecperp1;
-							newv2 = cos(M_PI + exitangle - newang) * szn + sin(M_PI + exitangle - newang) * vecperp2;
+							leangle2 = M_PI + exitangle - newang;
+							x00 = cos(leangle2) * sxn + sin(leangle2) * vecperp0;
+							x01 = cos(leangle2) * syn + sin(leangle2) * vecperp1;
+							x02 = cos(leangle2) * szn + sin(leangle2) * vecperp2;
+
+
+							dotpx1s = x10 * sxn + x11 * syn + x12 * szn;
+							dotpx1vp = x10 * vecperp0 + x11 * vecperp1 + x12 * vecperp2;
+
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
+
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
+
+
+							leangletmp = angf1 + leangle2 - leangle;
+
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
+
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
+
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
+
+							x10 = x10 - vecproj0 + levectmp0;
+							x11 = x11 - vecproj1 + levectmp1;
+							x12 = x12 - vecproj2 + levectmp2;
 
 
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x10 + newv1 * x11 + newv2 * x12;
+							dotpx1s = x20 * sxn + x21 * syn + x22 * szn;
+							dotpx1vp = x20 * vecperp0 + x21 * vecperp1 + x22 * vecperp2;
 
-							proj0 = x00 * dotp1 + x10 * dotp2;
-							proj1 = x01 * dotp1 + x11 * dotp2;
-							proj2 = x02 * dotp1 + x12 * dotp2;
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
-
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
-
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x10 + proj1 * x11 + proj2 * x12 < 0) ang1 *= -1;
-							}
-
-							newx00 = x00 * cos(ang1) + sin(ang1) * x10;
-							newx10 = x10 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x10 = newx10;
-
-							newx01 = x01 * cos(ang1) + sin(ang1) * x11;
-							newx11 = x11 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x11 = newx11;
-
-							newx02 = x02 * cos(ang1) + sin(ang1) * x12;
-							newx12 = x12 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x12 = newx12;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x20 + newv1 * x21 + newv2 * x22;
 
-							proj0 = x00 * dotp1 + x20 * dotp2;
-							proj1 = x01 * dotp1 + x21 * dotp2;
-							proj2 = x02 * dotp1 + x22 * dotp2;
+							leangletmp = angf1 + leangle2 - leangle;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x20 + proj1 * x21 + proj2 * x22 < 0) ang1 *= -1;
-							}
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x20;
-							newx20 = x20 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x20 = newx20;
-
-							newx01 = x01 * cos(ang1) + sin(ang1) * x21;
-							newx21 = x21 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x21 = newx21;
-
-							newx02 = x02 * cos(ang1) + sin(ang1) * x22;
-							newx22 = x22 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x22 = newx22;
-
-
+							x20 = x20 - vecproj0 + levectmp0;
+							x21 = x21 - vecproj1 + levectmp1;
+							x22 = x22 - vecproj2 + levectmp2;
 						}
 						else
 						{
@@ -1260,82 +1273,84 @@ int main()
 							pos1 *= 1 / whsize;
 							pos2 *= 1 / whsize;
 
-							newv0 = cos(M_PI + exitangle - newang) * sxn + sin(M_PI + exitangle - newang) * vecperp0;
-							newv1 = cos(M_PI + exitangle - newang) * syn + sin(M_PI + exitangle - newang) * vecperp1;
-							newv2 = cos(M_PI + exitangle - newang) * szn + sin(M_PI + exitangle - newang) * vecperp2;
+							leangle2 = M_PI + exitangle - newang;
+							x00 = cos(leangle2) * sxn + sin(leangle2) * vecperp0;
+							x01 = cos(leangle2) * syn + sin(leangle2) * vecperp1;
+							x02 = cos(leangle2) * szn + sin(leangle2) * vecperp2;
 
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x10 + newv1 * x11 + newv2 * x12;
+							dotpx1s = x10 * sxn + x11 * syn + x12 * szn;
+							dotpx1vp = x10 * vecperp0 + x11 * vecperp1 + x12 * vecperp2;
 
-							proj0 = x00 * dotp1 + x10 * dotp2;
-							proj1 = x01 * dotp1 + x11 * dotp2;
-							proj2 = x02 * dotp1 + x12 * dotp2;
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x10 + proj1 * x11 + proj2 * x12 < 0) ang1 *= -1;
-							}
+							leangletmp = angf1 + leangle2 - leangle;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x10;
-							newx10 = x10 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x10 = newx10;
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x11;
-							newx11 = x11 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x11 = newx11;
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x12;
-							newx12 = x12 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x12 = newx12;
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x20 + newv1 * x21 + newv2 * x22;
+							x10 = x10 - vecproj0 + levectmp0;
+							x11 = x11 - vecproj1 + levectmp1;
+							x12 = x12 - vecproj2 + levectmp2;
 
-							proj0 = x00 * dotp1 + x20 * dotp2;
-							proj1 = x01 * dotp1 + x21 * dotp2;
-							proj2 = x02 * dotp1 + x22 * dotp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
+							dotpx1s = x20 * sxn + x21 * syn + x22 * szn;
+							dotpx1vp = x20 * vecperp0 + x21 * vecperp1 + x22 * vecperp2;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x20 + proj1 * x21 + proj2 * x22 < 0) ang1 *= -1;
-							}
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x20;
-							newx20 = x20 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x20 = newx20;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x21;
-							newx21 = x21 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x21 = newx21;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x22;
-							newx22 = x22 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x22 = newx22;
+
+							leangletmp = angf1 + leangle2 - leangle;
+
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
+
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
+
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
+
+							x20 = x20 - vecproj0 + levectmp0;
+							x21 = x21 - vecproj1 + levectmp1;
+							x22 = x22 - vecproj2 + levectmp2;
 
 
 
@@ -1428,81 +1443,84 @@ int main()
 							pos1 *= 1 / ley2;
 							pos2 *= 1 / ley2;
 
-							newv0 = cos(M_PI + exitangle - newang) * sxn + sin(M_PI + exitangle - newang) * vecperp0;
-							newv1 = cos(M_PI + exitangle - newang) * syn + sin(M_PI + exitangle - newang) * vecperp1;
-							newv2 = cos(M_PI + exitangle - newang) * szn + sin(M_PI + exitangle - newang) * vecperp2;
+							leangle2 = M_PI + exitangle - newang;
+							x00 = cos(leangle2) * sxn + sin(leangle2) * vecperp0;
+							x01 = cos(leangle2) * syn + sin(leangle2) * vecperp1;
+							x02 = cos(leangle2) * szn + sin(leangle2) * vecperp2;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x10 + newv1 * x11 + newv2 * x12;
 
-							proj0 = x00 * dotp1 + x10 * dotp2;
-							proj1 = x01 * dotp1 + x11 * dotp2;
-							proj2 = x02 * dotp1 + x12 * dotp2;
+							dotpx1s = x10 * sxn + x11 * syn + x12 * szn;
+							dotpx1vp = x10 * vecperp0 + x11 * vecperp1 + x12 * vecperp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x10 + proj1 * x11 + proj2 * x12 < 0) ang1 *= -1;
-							}
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x10;
-							newx10 = x10 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x10 = newx10;
+							leangletmp = angf1 + leangle2 - leangle;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x11;
-							newx11 = x11 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x11 = newx11;
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x12;
-							newx12 = x12 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x12 = newx12;
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x20 + newv1 * x21 + newv2 * x22;
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
 
-							proj0 = x00 * dotp1 + x20 * dotp2;
-							proj1 = x01 * dotp1 + x21 * dotp2;
-							proj2 = x02 * dotp1 + x22 * dotp2;
+							x10 = x10 - vecproj0 + levectmp0;
+							x11 = x11 - vecproj1 + levectmp1;
+							x12 = x12 - vecproj2 + levectmp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x20 + proj1 * x21 + proj2 * x22 < 0) ang1 *= -1;
-							}
+							dotpx1s = x20 * sxn + x21 * syn + x22 * szn;
+							dotpx1vp = x20 * vecperp0 + x21 * vecperp1 + x22 * vecperp2;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x20;
-							newx20 = x20 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x20 = newx20;
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x21;
-							newx21 = x21 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x21 = newx21;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x22;
-							newx22 = x22 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x22 = newx22;
+
+
+							leangletmp = angf1 + leangle2 - leangle;
+
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
+
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
+
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
+
+							x20 = x20 - vecproj0 + levectmp0;
+							x21 = x21 - vecproj1 + levectmp1;
+							x22 = x22 - vecproj2 + levectmp2;
 						}
 
 					}
@@ -1595,85 +1613,84 @@ int main()
 							pos1 *= 1 / ley2;
 							pos2 *= 1 / ley2;
 
-							newv0 = cos(M_PI + exitangle - newang) * sxn + sin(M_PI + exitangle - newang) * vecperp0;
-							newv1 = cos(M_PI + exitangle - newang) * syn + sin(M_PI + exitangle - newang) * vecperp1;
-							newv2 = cos(M_PI + exitangle - newang) * szn + sin(M_PI + exitangle - newang) * vecperp2;
+							leangle2 = M_PI + exitangle - newang;
+							x00 = cos(leangle2) * sxn + sin(leangle2) * vecperp0;
+							x01 = cos(leangle2) * syn + sin(leangle2) * vecperp1;
+							x02 = cos(leangle2) * szn + sin(leangle2) * vecperp2;
+
+
+							dotpx1s = x10 * sxn + x11 * syn + x12 * szn;
+							dotpx1vp = x10 * vecperp0 + x11 * vecperp1 + x12 * vecperp2;
+
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
+
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
+
+
+							leangletmp = angf1 + leangle2 - leangle;
+
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
+
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
+
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
+
+							x10 = x10 - vecproj0 + levectmp0;
+							x11 = x11 - vecproj1 + levectmp1;
+							x12 = x12 - vecproj2 + levectmp2;
 
 
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x10 + newv1 * x11 + newv2 * x12;
+							dotpx1s = x20 * sxn + x21 * syn + x22 * szn;
+							dotpx1vp = x20 * vecperp0 + x21 * vecperp1 + x22 * vecperp2;
 
-							proj0 = x00 * dotp1 + x10 * dotp2;
-							proj1 = x01 * dotp1 + x11 * dotp2;
-							proj2 = x02 * dotp1 + x12 * dotp2;
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
-
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
-
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x10 + proj1 * x11 + proj2 * x12 < 0) ang1 *= -1;
-							}
-
-							newx00 = x00 * cos(ang1) + sin(ang1) * x10;
-							newx10 = x10 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x10 = newx10;
-
-							newx01 = x01 * cos(ang1) + sin(ang1) * x11;
-							newx11 = x11 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x11 = newx11;
-
-							newx02 = x02 * cos(ang1) + sin(ang1) * x12;
-							newx12 = x12 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x12 = newx12;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x20 + newv1 * x21 + newv2 * x22;
 
-							proj0 = x00 * dotp1 + x20 * dotp2;
-							proj1 = x01 * dotp1 + x21 * dotp2;
-							proj2 = x02 * dotp1 + x22 * dotp2;
+							leangletmp = angf1 + leangle2 - leangle;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x20 + proj1 * x21 + proj2 * x22 < 0) ang1 *= -1;
-							}
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x20;
-							newx20 = x20 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x20 = newx20;
-
-							newx01 = x01 * cos(ang1) + sin(ang1) * x21;
-							newx21 = x21 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x21 = newx21;
-
-							newx02 = x02 * cos(ang1) + sin(ang1) * x22;
-							newx22 = x22 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x22 = newx22;
-
+							x20 = x20 - vecproj0 + levectmp0;
+							x21 = x21 - vecproj1 + levectmp1;
+							x22 = x22 - vecproj2 + levectmp2;
 
 						}
 						else
@@ -1701,82 +1718,84 @@ int main()
 							pos1 *= 1 / whsize;
 							pos2 *= 1 / whsize;
 
-							newv0 = cos(M_PI + exitangle - newang) * sxn + sin(M_PI + exitangle - newang) * vecperp0;
-							newv1 = cos(M_PI + exitangle - newang) * syn + sin(M_PI + exitangle - newang) * vecperp1;
-							newv2 = cos(M_PI + exitangle - newang) * szn + sin(M_PI + exitangle - newang) * vecperp2;
+							leangle2 = M_PI + exitangle - newang;
+							x00 = cos(leangle2) * sxn + sin(leangle2) * vecperp0;
+							x01 = cos(leangle2) * syn + sin(leangle2) * vecperp1;
+							x02 = cos(leangle2) * szn + sin(leangle2) * vecperp2;
 
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x10 + newv1 * x11 + newv2 * x12;
+							dotpx1s = x10 * sxn + x11 * syn + x12 * szn;
+							dotpx1vp = x10 * vecperp0 + x11 * vecperp1 + x12 * vecperp2;
 
-							proj0 = x00 * dotp1 + x10 * dotp2;
-							proj1 = x01 * dotp1 + x11 * dotp2;
-							proj2 = x02 * dotp1 + x12 * dotp2;
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x10 + proj1 * x11 + proj2 * x12 < 0) ang1 *= -1;
-							}
+							leangletmp = angf1 + leangle2 - leangle;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x10;
-							newx10 = x10 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x10 = newx10;
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x11;
-							newx11 = x11 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x11 = newx11;
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x12;
-							newx12 = x12 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x12 = newx12;
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x20 + newv1 * x21 + newv2 * x22;
+							x10 = x10 - vecproj0 + levectmp0;
+							x11 = x11 - vecproj1 + levectmp1;
+							x12 = x12 - vecproj2 + levectmp2;
 
-							proj0 = x00 * dotp1 + x20 * dotp2;
-							proj1 = x01 * dotp1 + x21 * dotp2;
-							proj2 = x02 * dotp1 + x22 * dotp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
+							dotpx1s = x20 * sxn + x21 * syn + x22 * szn;
+							dotpx1vp = x20 * vecperp0 + x21 * vecperp1 + x22 * vecperp2;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x20 + proj1 * x21 + proj2 * x22 < 0) ang1 *= -1;
-							}
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x20;
-							newx20 = x20 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x20 = newx20;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x21;
-							newx21 = x21 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x21 = newx21;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x22;
-							newx22 = x22 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x22 = newx22;
+
+							leangletmp = angf1 + leangle2 - leangle;
+
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
+
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
+
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
+
+							x20 = x20 - vecproj0 + levectmp0;
+							x21 = x21 - vecproj1 + levectmp1;
+							x22 = x22 - vecproj2 + levectmp2;
 
 
 
@@ -1869,81 +1888,84 @@ int main()
 							pos1 *= 1 / ley2;
 							pos2 *= 1 / ley2;
 
-							newv0 = cos(M_PI + exitangle - newang) * sxn + sin(M_PI + exitangle - newang) * vecperp0;
-							newv1 = cos(M_PI + exitangle - newang) * syn + sin(M_PI + exitangle - newang) * vecperp1;
-							newv2 = cos(M_PI + exitangle - newang) * szn + sin(M_PI + exitangle - newang) * vecperp2;
+							leangle2 = M_PI + exitangle - newang;
+							x00 = cos(leangle2) * sxn + sin(leangle2) * vecperp0;
+							x01 = cos(leangle2) * syn + sin(leangle2) * vecperp1;
+							x02 = cos(leangle2) * szn + sin(leangle2) * vecperp2;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x10 + newv1 * x11 + newv2 * x12;
 
-							proj0 = x00 * dotp1 + x10 * dotp2;
-							proj1 = x01 * dotp1 + x11 * dotp2;
-							proj2 = x02 * dotp1 + x12 * dotp2;
+							dotpx1s = x10 * sxn + x11 * syn + x12 * szn;
+							dotpx1vp = x10 * vecperp0 + x11 * vecperp1 + x12 * vecperp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x10 + proj1 * x11 + proj2 * x12 < 0) ang1 *= -1;
-							}
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x10;
-							newx10 = x10 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x10 = newx10;
+							leangletmp = angf1 + leangle2 - leangle;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x11;
-							newx11 = x11 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x11 = newx11;
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x12;
-							newx12 = x12 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x12 = newx12;
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
 
-							dotp1 = newv0 * x00 + newv1 * x01 + newv2 * x02;
-							dotp2 = newv0 * x20 + newv1 * x21 + newv2 * x22;
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
 
-							proj0 = x00 * dotp1 + x20 * dotp2;
-							proj1 = x01 * dotp1 + x21 * dotp2;
-							proj2 = x02 * dotp1 + x22 * dotp2;
+							x10 = x10 - vecproj0 + levectmp0;
+							x11 = x11 - vecproj1 + levectmp1;
+							x12 = x12 - vecproj2 + levectmp2;
 
-							projn = sqrt(proj0 * proj0 + proj1 * proj1 + proj2 * proj2);
 
-							proj0 /= projn;
-							proj1 /= projn;
-							proj2 /= projn;
 
-							tmpl = proj0 * x00 + proj1 * x01 + proj2 * x02;
-							if (abs(tmpl) > 1) ang1 = 0;
-							else
-							{
-								ang1 = acos(tmpl);
-								if (proj0 * x20 + proj1 * x21 + proj2 * x22 < 0) ang1 *= -1;
-							}
+							dotpx1s = x20 * sxn + x21 * syn + x22 * szn;
+							dotpx1vp = x20 * vecperp0 + x21 * vecperp1 + x22 * vecperp2;
 
-							newx00 = x00 * cos(ang1) + sin(ang1) * x20;
-							newx20 = x20 * cos(ang1) - sin(ang1) * x00;
-							x00 = newx00;
-							x20 = newx20;
+							vecproj0 = dotpx1s * sxn + dotpx1vp * vecperp0;
+							vecproj1 = dotpx1s * syn + dotpx1vp * vecperp1;
+							vecproj2 = dotpx1s * szn + dotpx1vp * vecperp2;
 
-							newx01 = x01 * cos(ang1) + sin(ang1) * x21;
-							newx21 = x21 * cos(ang1) - sin(ang1) * x01;
-							x01 = newx01;
-							x21 = newx21;
+							vecprojn = sqrt(vecproj0 * vecproj0 + vecproj1 * vecproj1 + vecproj2 * vecproj2);
+							 
+							vecproj0 /= vecprojn;
+							vecproj1 /= vecprojn;
+							vecproj2 /= vecprojn;
+							 
+							angf1 = acos(vecproj0 * sxn + vecproj1 * syn + vecproj2 * szn);
+							if (vecproj0 * vecperp0 + vecproj1 * vecperp1 + vecproj2 * vecperp2 < 0) angf1 *= -1;
 
-							newx02 = x02 * cos(ang1) + sin(ang1) * x22;
-							newx22 = x22 * cos(ang1) - sin(ang1) * x02;
-							x02 = newx02;
-							x22 = newx22;
+
+
+							leangletmp = angf1 + leangle2 - leangle;
+
+							levectmp0 = cos(leangletmp) * sxn + sin(leangletmp) * vecperp0;
+							levectmp1 = cos(leangletmp) * syn + sin(leangletmp) * vecperp1;
+							levectmp2 = cos(leangletmp) * szn + sin(leangletmp) * vecperp2;
+
+							levectmp0 *= vecprojn;
+							levectmp1 *= vecprojn;
+							levectmp2 *= vecprojn;
+
+							vecproj0 *= vecprojn;
+							vecproj1 *= vecprojn;
+							vecproj2 *= vecprojn;
+
+							x20 = x20 - vecproj0 + levectmp0;
+							x21 = x21 - vecproj1 + levectmp1;
+							x22 = x22 - vecproj2 + levectmp2;
 						}
 
 					}
@@ -1958,6 +1980,39 @@ int main()
 
         if (focus)
         {
+			xl = sqrt(x00 * x00 + x01 * x01 + x02 * x02);
+			x00 /= xl;
+			x01 /= xl;
+			x02 /= xl;
+
+			dotp = x00 * x10 + x01 * x11 + x02 * x12;
+
+			x10 = x10 - x00 * dotp;
+			x11 = x11 - x01 * dotp;
+			x12 = x12 - x02 * dotp;
+
+			xl = sqrt(x10 * x10 + x11 * x11 + x12 * x12);
+			x10 /= xl;
+			x11 /= xl;
+			x12 /= xl;
+
+			dotp = x00 * x20 + x01 * x21 + x02 * x22;
+
+			x20 = x20 - x00 * dotp;
+			x21 = x21 - x01 * dotp;
+			x22 = x22 - x02 * dotp;
+
+			dotp = x10 * x20 + x11 * x21 + x12 * x22;
+
+			x20 = x20 - x10 * dotp;
+			x21 = x21 - x11 * dotp;
+			x22 = x22 - x12 * dotp;
+
+			xl = sqrt(x20 * x20 + x21 * x21 + x22 * x22);
+			x20 /= xl;
+			x21 /= xl;
+			x22 /= xl;
+
             vec0 = dist * x00 + multy * x10 + multz * x20;
             vec1 = dist * x01 + multy * x11 + multz * x21;
             vec2 = dist * x02 + multy * x12 + multz * x22;
